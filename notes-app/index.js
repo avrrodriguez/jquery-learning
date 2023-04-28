@@ -22,6 +22,15 @@ function formatTitle(body) {
   }
 }
 
+function selectNote($note) {
+  // console.log("select note", $note);
+  document.querySelector(".note-selector.active")?.classList.remove("active");
+  $note.classList.add("active");
+
+  document.querySelector(".note-editor-input").value = $note.dataset.body;
+  document.querySelector(".note-editor-info").innerHTML = formatTimestamp(parseInt($note.dataset.timestamp));
+}
+
 var notes = [
   { id: 1, body: "This is a First Test", timestamp: Date.now() - 30000000000 },
   { id: 2, body: "This is ", timestamp: Date.now() - 20000000000 },
@@ -33,7 +42,12 @@ var htmlString = "";
 
 transformNotes(notes).forEach(function (note) {
   htmlString += `
-        <div class="note-selector active" id=${note.id}>
+        <div
+          class="note-selector"
+          onclick="selectNote(this)"
+          data-body="${note.body}"
+          data-timestamp="${note.timestamp}"
+          >
           <p class="note-selector-title">${formatTitle(note.body)}</p>
           <p class="note-selector-timestamp">${formatTimestamp(note.timestamp)}</p>
         </div>
