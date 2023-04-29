@@ -22,8 +22,48 @@ function formatTitle(body) {
   }
 }
 
+function updateNote() {
+  var body = this.value;
+  var timestamp = Date.now();
+
+  var $note = document.querySelector(".note-selector.active");
+  $note.dataset.body = body;
+  $note.dataset.timestamp = timestamp;
+
+  document.querySelector(".note-editor-info").innerHTML = formatTimestamp(parseInt(timestamp));
+  document.querySelector(".note-selector.active .note-selector-title").innerHTML = formatTitle(body);
+  document.querySelector(".note-selector.active .note-selector-timestamp").innerHTML = formatTimestamp(
+    parseInt(timestamp)
+  );
+
+  document.querySelector(".note-selectors").removeChild($note);
+  document.querySelector(".note-selectors").prepend($note);
+}
+
+function createNote() {
+  var note = { id: Date.now(), body: "", timestamp: Date.now() };
+  var htmlString = `
+        <div
+          class="note-selector"
+          onclick="selectNote(this)"
+          data-body="${note.body}"
+          data-timestamp="${note.timestamp}"
+          >
+          <p class="note-selector-title">${formatTitle(note.body)}</p>
+          <p class="note-selector-timestamp">${formatTimestamp(note.timestamp)}</p>
+        </div>
+  `;
+  document.querySelector(".note-selectors").insertAdjacentHTML("afterbegin", htmlString);
+  document.querySelector(".note-selector").click();
+}
+
+function deleteNote() {
+  var $note = document.querySelector(".note-selector.active");
+  var $parent = document.querySelector(".note-selectors");
+  $parent.removeChild($note);
+}
+
 function selectNote($note) {
-  // console.log("select note", $note);
   document.querySelector(".note-selector.active")?.classList.remove("active");
   $note.classList.add("active");
 
@@ -55,3 +95,6 @@ transformNotes(notes).forEach(function (note) {
 });
 
 document.querySelector(".note-selectors").innerHTML = htmlString;
+document.querySelector(".note-editor-input").addEventListener("input", updateNote);
+document.querySelector(".toolbar-button-new").addEventListener("click", createNote);
+document.querySelector(".toolbar-button-delete").addEventListener("click", deleteNote);
