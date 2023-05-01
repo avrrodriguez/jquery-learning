@@ -41,6 +41,7 @@ function updateNote() {
 }
 
 function createNote() {
+  document.querySelector(".note-editor").style.display = "";
   var note = { id: Date.now(), body: "", timestamp: Date.now() };
   var htmlString = `
         <div
@@ -59,8 +60,15 @@ function createNote() {
 
 function deleteNote() {
   var $note = document.querySelector(".note-selector.active");
-  var $parent = document.querySelector(".note-selectors");
-  $parent.removeChild($note);
+
+  if ($note) {
+    var $parent = document.querySelector(".note-selectors");
+    $parent.removeChild($note);
+  }
+  document.querySelector(".note-selector")?.click();
+  if (!document.querySelector(".note-selector")) {
+    document.querySelector(".note-editor").style.display = "none";
+  }
 }
 
 function selectNote($note) {
@@ -69,6 +77,29 @@ function selectNote($note) {
 
   document.querySelector(".note-editor-input").value = $note.dataset.body;
   document.querySelector(".note-editor-info").innerHTML = formatTimestamp(parseInt($note.dataset.timestamp));
+}
+
+function searchNotes() {
+  var searchText = this.value.toLowerCase();
+  document.querySelectorAll(".note-selector").forEach(function ($note) {
+    var noteText = $note.dataset.body.toLowerCase();
+    if (noteText.indexOf(searchText) === -1) {
+      $note.style.display = "none";
+      $note.classList.remove("active");
+    } else {
+      $note.style.display = "";
+    }
+  });
+
+  if (!document.querySelector(".note-selector.active")) {
+    var $firstVisibleNote = document.querySelector(".note-selector:not([style*='display: none'])");
+    if ($firstVisibleNote) {
+      $firstVisibleNote.click();
+      document.querySelector(".note-editor").style.display = "";
+    } else {
+      document.querySelector(".note-editor").style.display = "none";
+    }
+  }
 }
 
 var notes = [
@@ -98,3 +129,4 @@ document.querySelector(".note-selectors").innerHTML = htmlString;
 document.querySelector(".note-editor-input").addEventListener("input", updateNote);
 document.querySelector(".toolbar-button-new").addEventListener("click", createNote);
 document.querySelector(".toolbar-button-delete").addEventListener("click", deleteNote);
+document.querySelector(".toolbar-search").addEventListener("input", searchNotes);
